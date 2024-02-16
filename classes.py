@@ -42,7 +42,8 @@ class PhoneBook:
         зададим название файла-базы и кодировку (нужна для нормального отображения кириллицы)
         '''
         self.filename = filename
-        open(file=self.filename, mode='w').close()
+        if not os.path.exists(self.filename):
+            open(file=self.filename, mode='w').close()
         self.encoding = 'utf-8'
 
     def check_if_file_exist(method: Callable[..., Any]) -> Callable[..., Any]:
@@ -54,12 +55,12 @@ class PhoneBook:
         return wrapper
 
     @check_if_file_exist
-    def show_entries(self) -> None:
+    def show_entries(self) -> None | bool:
         '''
         метод для вывода всех записей из телефонной книги в алфавитном порядке
 
         :param: нет
-        :return: нет
+        :return: или None или int - в случае, если база данных пуста, будет возвращаться False
         '''
         entries = []
         with open(file=self.filename, mode='r', encoding=self.encoding) as phone_book:
@@ -70,7 +71,7 @@ class PhoneBook:
             
             if len(entries) == 0:
                 print('Телефонная книга пуста')
-                return
+                return False
             
             self.draw_table_header()
 
@@ -117,7 +118,6 @@ class PhoneBook:
         with open(file=self.filename, mode='r', encoding='utf-8') as phone_book:
             entry_line = phone_book.readline()
             while entry_line:
-                print(entry_line, ' '.join([last_name, first_name, patronymic]))
                 if self.entries_equal(entry_line, ' '.join([last_name, first_name, patronymic])):
                     default_values = entry_line.split()
                     values = entry.__dict__.keys()
@@ -178,6 +178,7 @@ class PhoneBook:
             while entry_line:
                 if self.entries_equal(entry_line, ' '.join([last_name, first_name, patronymic])):
                     return True
+                entry_line = phone_book.readline()
                 
         return False
 

@@ -51,7 +51,7 @@ def input_number(message: str) -> str:
     
     nums = [symbol for symbol in phone_number if symbol.isdigit()]
     while len(nums) != 11:
-        phone_number = input('Номер некорректен! Введите корректный номер: ')
+        phone_number = input('Номер некорректен - 11 символов! Введите корректный номер: ')
         nums = [symbol for symbol in phone_number if symbol.isdigit()]
 
     correct_number_format = '+7' + \
@@ -74,16 +74,25 @@ def main() -> None:
     filename = sys.argv[1] if len(sys.argv) > 1 else 'base.txt'
     phone_book = PhoneBook(filename=filename)
 
-    command = read_command()
+    command = '-1'
 
     while command != '0':
+        command = read_command()
+
+        if command == '0':
+            print('До свидания')
+            sys.exit()
+
         if command == '1':
             print('\nВведите данные для внесения новой записи')
             entry = Entry(*input_entry())
             phone_book.add_entry(entry)
 
         elif command == '2':
-            phone_book.show_entries()
+            phone_book_has_entries = phone_book.show_entries()
+            if phone_book_has_entries == False:
+                print('Сначала добавьте в нее несколько записей')
+                continue
             print('\nВведите данные записи, которую хотите обновить (фамилию, имя и отчество человека)')
             last_name = input('Введите фамилию: ').title()
             first_name = input('Введите имя: ').title()
@@ -129,7 +138,6 @@ def main() -> None:
         else:
             print('Неизвестная команда')
 
-        command = read_command()
 
 if __name__ == '__main__':
     main()
